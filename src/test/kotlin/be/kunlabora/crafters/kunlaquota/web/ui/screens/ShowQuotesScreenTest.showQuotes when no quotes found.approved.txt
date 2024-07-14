@@ -1,0 +1,4 @@
+<section class="section" id="quote-section">
+  <div class="container">Be the first to create a new quote!</div>
+</section>
+<button class="button is-primary" id="add-quote" style="position: fixed; bottom: 20px; right: 20px;" hx-get="/ui/showModal" hx-target="#modals-here" _="on htmx:afterOnLoad wait 10ms then add .is-active to addquotemodal">Add Quote</button>

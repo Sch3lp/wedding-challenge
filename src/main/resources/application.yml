@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: kunlaquota
+  datasource:
+#    url: jdbc:h2:mem:testdb?syntax=postgres
+#    driver-class-name: org.h2.Driver
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/kunlaquota
+    username: kunla
+    password: quota
+  flyway:
+    enabled: true
+  jackson:
+    date-format: com.fasterxml.jackson.databind.util.StdDateFormat

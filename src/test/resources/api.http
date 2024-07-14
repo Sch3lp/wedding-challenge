@@ -1,0 +1,37 @@
+### Get all Quotes
+GET http://localhost:8080/api/quote
+
+### Create Quote
+POST http://localhost:8080/api/quote
+Content-Type: application/json
+
+{
+  "@type": "AddQuote",
+  "lines": [
+    {
+      "order": 1,
+      "name": "Jonesuuu",
+      "text": "When I kotlin, I kotlin. When I java, I java. But when I javascript.. I die a little on the inside"
+    },
+    {
+      "order": 2,
+      "name": "Karel1980",
+      "text": "'I don't like component scanning' should be the first quote you put in the system when it's live"
+    }
+  ]
+}
+
+### Share Quote
+POST http://localhost:8080/api/quote/share
+Content-Type: application/json
+Accept: application/json
+
+{
+  "@type": "ShareQuote",
+  "id": {
+    "value": "a0ab07e8-a48e-483e-8df0-193ef48df3a0"
+  }
+}
+
+### Read Shared Quote
+GET http://localhost:8080/api/quote?share=ISWSDPG
