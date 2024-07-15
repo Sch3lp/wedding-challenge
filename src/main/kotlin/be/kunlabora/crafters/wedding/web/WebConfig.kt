@@ -8,8 +8,8 @@ import be.kunlabora.crafters.wedding.service.domain.ChallengeId
 import be.kunlabora.crafters.wedding.service.get
 import be.kunlabora.crafters.wedding.web.ui.WeddingTheme
 import be.kunlabora.crafters.wedding.web.ui.partial
-import be.kunlabora.crafters.wedding.web.ui.screens.MainScreen.assigneeFieldName
 import be.kunlabora.crafters.wedding.web.ui.screens.MainScreen.assigneeSelection
+import be.kunlabora.crafters.wedding.web.ui.screens.MainScreen.assignees
 import be.kunlabora.crafters.wedding.web.ui.screens.MainScreen.errorMessage
 import be.kunlabora.crafters.wedding.web.ui.screens.MainScreen.showChallenges
 import be.kunlabora.crafters.wedding.web.ui.wrapper
@@ -45,16 +45,26 @@ class WebConfig : WebMvcConfigurer {
                         if (selectedAssignee != null) {
                             showChallenges(wedding.findAllChallengesFor(selectedAssignee.id))
                         } else {
-                            assigneeSelection(wedding.assignees)
+                            assigneeSelection(emptyList())
                         }
                     }
                 )
         }
 
-        POST("select-assignee") { request ->
+        GET("/search") { request ->
+            val result = request.paramOrNull("q")?.ifBlank { null }
+                ?.let { query -> wedding.assignees.filter { it.name.startsWith(query, ignoreCase = true) } }
+                ?: emptyList()
+            ServerResponse.status(HttpStatus.OK)
+                .body(
+                    partial { assignees(result) }
+                )
+        }
+
+        POST("select-assignee/{id}") { request ->
             ServerResponse.status(HttpStatus.OK)
                 .header("HX-Redirect", "/")
-                .cookie(SelectedAssigneeCookie(request.paramOrNull(assigneeFieldName)!!))
+                .cookie(SelectedAssigneeCookie(request.pathVariable("id")))
                 .build()
         }
 

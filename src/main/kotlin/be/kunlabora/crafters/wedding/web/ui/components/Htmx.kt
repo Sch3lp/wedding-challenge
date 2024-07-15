@@ -18,6 +18,11 @@ object Htmx {
         set(value) {
             attributes["hx-target"] = value
         }
+    var Tag.hxTrigger: String
+        get() = error("not implemented")
+        set(value) {
+            attributes["hx-trigger"] = value
+        }
     var Tag.hxSwap: String
         get() = error("not implemented")
         set(value) {

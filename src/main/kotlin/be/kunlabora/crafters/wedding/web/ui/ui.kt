@@ -15,7 +15,6 @@ sealed interface WeddingTheme {
         override val value = "light"
     }
 
-
     companion object {
         val default = Dark
 
