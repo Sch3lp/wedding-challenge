@@ -6,6 +6,7 @@ import be.kunlabora.crafters.wedding.service.domain.Assignee
 import be.kunlabora.crafters.wedding.service.domain.AssigneeId
 import be.kunlabora.crafters.wedding.service.domain.ChallengeId
 import be.kunlabora.crafters.wedding.service.get
+import be.kunlabora.crafters.wedding.web.ui.WeddingTheme
 import be.kunlabora.crafters.wedding.web.ui.partial
 import be.kunlabora.crafters.wedding.web.ui.screens.MainScreen.assigneeFieldName
 import be.kunlabora.crafters.wedding.web.ui.screens.MainScreen.assigneeSelection
@@ -23,36 +24,24 @@ import org.springframework.web.servlet.function.ServerResponse
 import org.springframework.web.servlet.function.paramOrNull
 import org.springframework.web.servlet.function.router
 
-private const val selected_assignee_cookie = "selectedAssignee"
-
-data class SelectedAssigneeCookie(val assigneeIdString: String) : Cookie(selected_assignee_cookie, assigneeIdString) {
-    val assigneeId: AssigneeId get() = AssigneeId.fromString(assigneeIdString)
-    fun deleted(): SelectedAssigneeCookie = copy(assigneeIdString = assigneeIdString)
-        .apply {
-            setAttribute("expires", "Thu, 01 Jan 1970 00:00:00 GMT")
-        }
-
-    init {
-        path = "/"
-    }
-}
-
 @Configuration
 class WebConfig : WebMvcConfigurer {
 
     @Bean
     fun routes(wedding: WeddingBehavior) = router {
         fun SelectedAssigneeCookie?.fetch(): Assignee? =
-            this?.assigneeId?.let { id -> wedding.assignees.first { it.id ==  id } }
+            this?.assigneeId?.let { id -> wedding.assignees.first { it.id == id } }
 
         GET("/") { request ->
             val selectedAssignee = request.getSelectedAssignee()?.fetch()
+            val theme: WeddingTheme? = request.getTheme()
 
             val title = "WeddingChallenge"
             ServerResponse.status(HttpStatus.OK)
                 .contentType(MediaType.TEXT_HTML)
+                .apply { if (theme == null) cookie(WeddingThemeCookie(WeddingTheme.default)) }
                 .body(
-                    wrapper(title, selectedAssignee) {
+                    wrapper(title, theme ?: WeddingTheme.default, selectedAssignee) {
                         if (selectedAssignee != null) {
                             showChallenges(wedding.findAllChallengesFor(selectedAssignee.id))
                         } else {
@@ -84,20 +73,59 @@ class WebConfig : WebMvcConfigurer {
         }
 
         POST("/reset") { request ->
-            request.getSelectedAssignee()
-                ?.let {
-                    ServerResponse.status(HttpStatus.OK)
-                        .header("HX-Redirect", "/")
-                        .cookie(it.deleted())
-                        .build()
-                } ?: ServerResponse.status(HttpStatus.OK)
+            ServerResponse.status(HttpStatus.OK)
                 .header("HX-Redirect", "/")
+                .apply {
+                    val selectedAssignee = request.getSelectedAssignee()
+                    if (selectedAssignee != null) cookie(selectedAssignee.deleted())
+                }
+                .build()
+        }
+
+        POST("/toggle/{theme}") { request ->
+            val theme = WeddingTheme.fromString(request.pathVariable("theme"))
+
+            ServerResponse.status(HttpStatus.OK)
+                .header("HX-Redirect", "/")
+                .cookie(WeddingThemeCookie(theme))
                 .build()
         }
     }
 
     private fun ServerRequest.getSelectedAssignee(): SelectedAssigneeCookie? =
-        cookies().toSingleValueMap()[selected_assignee_cookie]?.let { SelectedAssigneeCookie(it.value) }
+        cookies().toSingleValueMap()[SelectedAssigneeCookie.key]?.let { SelectedAssigneeCookie(it.value) }
 
+    private fun ServerRequest.getTheme(): WeddingTheme? =
+        cookies().toSingleValueMap()[WeddingThemeCookie.key]?.let { WeddingThemeCookie(it.value) }?.theme
 }
 
+
+data class SelectedAssigneeCookie(val assigneeIdString: String) : Cookie(key, assigneeIdString) {
+    val assigneeId: AssigneeId get() = AssigneeId.fromString(assigneeIdString)
+    fun deleted(): SelectedAssigneeCookie = copy(assigneeIdString = assigneeIdString)
+        .apply {
+            setAttribute("expires", "Thu, 01 Jan 1970 00:00:00 GMT")
+        }
+
+    init {
+        path = "/"
+    }
+
+    companion object {
+        const val key = "selectedAssignee"
+    }
+}
+
+data class WeddingThemeCookie(val themeAsString: String) : Cookie(key, themeAsString) {
+    constructor(theme: WeddingTheme) : this(theme.toString())
+
+    val theme: WeddingTheme get() = WeddingTheme.fromString(themeAsString)
+
+    init {
+        path = "/"
+    }
+
+    companion object {
+        const val key = "weddingTheme"
+    }
+}

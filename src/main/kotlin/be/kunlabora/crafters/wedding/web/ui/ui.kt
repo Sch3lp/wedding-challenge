@@ -6,8 +6,31 @@ import kotlinx.html.*
 import kotlinx.html.stream.appendHTML
 import java.io.StringWriter
 
-fun wrapper(title: String, selectedAssignee: Assignee?, block: BODY.() -> Unit) =
+sealed interface WeddingTheme {
+    val value: String
+    data object Dark: WeddingTheme {
+        override val value = "dark"
+    }
+    data object Light: WeddingTheme {
+        override val value = "light"
+    }
+
+
+    companion object {
+        val default = Dark
+
+        fun fromString(string: String): WeddingTheme = when (string) {
+            Dark.toString() -> Dark
+            Light.toString() -> Light
+            else -> default
+        }
+    }
+}
+
+
+fun wrapper(title: String, currentTheme: WeddingTheme, selectedAssignee: Assignee?, block: BODY.() -> Unit) =
     StringWriter().appendHTML().html {
+        attributes["data-theme"] = currentTheme.value
         head {
             title { +title }
             meta(charset = "utf-8")
@@ -24,7 +47,7 @@ fun wrapper(title: String, selectedAssignee: Assignee?, block: BODY.() -> Unit) 
             script(src = "https://unpkg.com/hyperscript.org@0.9.12") {}
         }
         body {
-            hero(selectedAssignee)
+            hero(currentTheme, selectedAssignee)
             div(classes = "block") { id = "errorMessages" }
             block()
             div { id = "modals-here" }
