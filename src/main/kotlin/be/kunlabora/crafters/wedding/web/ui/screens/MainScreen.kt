@@ -40,8 +40,8 @@ object MainScreen {
         div("container") {
             if (challenges.isEmpty()) {
                 div("box") {
-                    div("field is-centered") {
-                        p { +"No challenges for you! Simply enjoy the wedding!" }
+                    div("field") {
+                        p { +"No more challenges for you! Simply enjoy the wedding!" }
                     }
                 }
             } else challenges.forEach { challenge(it) }
@@ -49,9 +49,29 @@ object MainScreen {
     }
 
     private fun FlowContent.challenge(challenge: Challenge) {
+        if (!challenge.completed) uncompletedChallenge(challenge)
+        else completedChallenge(challenge)
+    }
+
+    private fun FlowContent.uncompletedChallenge(challenge: Challenge) {
         div("card") {
-            div("card-content") {
-                +challenge.description
+            header("card-header") {
+                p("card-header-title") { +challenge.description }
+                button(classes = "card-header-icon") {
+                    hxPost = "/complete/${challenge.id.value}"
+
+                    span("icon") {
+                        i("fas fa-check has-text-success")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun FlowContent.completedChallenge(challenge: Challenge) {
+        div("card") {
+            header("card-header") {
+                p("card-header-title has-text-success") { +challenge.description }
             }
         }
     }

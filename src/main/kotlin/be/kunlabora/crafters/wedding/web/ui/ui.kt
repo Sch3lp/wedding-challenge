@@ -14,11 +14,11 @@ fun wrapper(title: String, selectedAssignee: Assignee?, block: BODY.() -> Unit) 
             meta(name = "viewport", content = "width=device-width, initial-scale=1")
             link(
                 rel = "stylesheet",
-                href = "https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/versions/bulma-no-dark-mode.min.css"
+                href = "https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css"
             )
             link(
                 rel = "stylesheet",
-                href = "https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/fontawesome.min.css"
+                href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
             )
             script(src = "https://unpkg.com/htmx.org@2.0.0") {}
             script(src = "https://unpkg.com/hyperscript.org@0.9.12") {}
