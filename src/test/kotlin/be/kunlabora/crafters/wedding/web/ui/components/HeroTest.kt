@@ -8,6 +8,6 @@ import verify
 class HeroTest {
     @Test
     fun `verify hero partial`() {
-        partial { hero() }.verify()
+        partial { hero(selectedAssigneeId) }.verify()
     }
 }

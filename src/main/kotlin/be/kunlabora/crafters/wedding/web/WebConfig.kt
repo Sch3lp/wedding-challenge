@@ -17,13 +17,20 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
 import org.springframework.web.servlet.function.paramOrNull
 import org.springframework.web.servlet.function.router
 
 private const val selected_assignee_cookie = "selectedAssignee"
 
-data class SelectedAssigneeCookie(val assigneeId: String): Cookie(selected_assignee_cookie, assigneeId) {
+data class SelectedAssigneeCookie(val assigneeIdString: String) : Cookie(selected_assignee_cookie, assigneeIdString) {
+    val assigneeId: AssigneeId get() = AssigneeId.fromString(assigneeIdString)
+    fun deleted(): SelectedAssigneeCookie = copy(assigneeIdString = assigneeIdString)
+        .apply {
+            setAttribute("expires", "Thu, 01 Jan 1970 00:00:00 GMT")
+        }
+
     init {
         path = "/"
     }
@@ -34,15 +41,14 @@ class WebConfig : WebMvcConfigurer {
 
     @Bean
     fun routes(wedding: WeddingBehavior) = router {
-        GET() { request ->
-            val selectedAssigneeId: AssigneeId? =
-                request.cookies().toSingleValueMap()[selected_assignee_cookie]?.let { AssigneeId.fromString(it.value) }
+        GET("/") { request ->
+            val selectedAssigneeId = request.getSelectedAssignee()?.assigneeId
 
             val title = "WeddingChallenge"
             ServerResponse.status(HttpStatus.OK)
                 .contentType(MediaType.TEXT_HTML)
                 .body(
-                    wrapper(title) {
+                    wrapper(title, selectedAssigneeId) {
                         if (selectedAssigneeId != null) {
                             showChallenges(wedding.findAllChallengesFor(selectedAssigneeId))
                         } else {
@@ -72,5 +78,20 @@ class WebConfig : WebMvcConfigurer {
                         .body(partial { errorMessage("Oopsie! Something broke!", failure.message) })
                 }.get()
         }
+
+        POST("/reset") { request ->
+            request.getSelectedAssignee()
+                ?.let {
+                    ServerResponse.status(HttpStatus.OK)
+                        .header("HX-Redirect", "/")
+                        .cookie(it.deleted())
+                        .build()
+                } ?: ServerResponse.status(HttpStatus.OK)
+                .header("HX-Redirect", "/")
+                .build()
+        }
     }
+
+    private fun ServerRequest.getSelectedAssignee(): SelectedAssigneeCookie? =
+        cookies().toSingleValueMap()[selected_assignee_cookie]?.let { SelectedAssigneeCookie(it.value) }
 }
