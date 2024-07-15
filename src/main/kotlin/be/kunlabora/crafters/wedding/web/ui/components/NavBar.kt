@@ -8,32 +8,32 @@ import kotlinx.html.*
 object NavBar {
     fun FlowContent.navbar(currentTheme: WeddingTheme, selectedAssignee: Assignee?) {
         nav("navbar is-primary") {
-            themeToggle(currentTheme)
-            logout(selectedAssignee)
-        }
-    }
-
-    private fun NAV.logout(selectedAssignee: Assignee?) {
-        if (selectedAssignee != null) {
             div("navbar-item") {
-                a(classes = "button is-link") {
-                    hxPost = "reset"
-                    +"Hello ${selectedAssignee.name}! Not you?"
+                div("buttons") {
+                    themeToggle(currentTheme)
+                    logout(selectedAssignee)
                 }
             }
         }
     }
 
-    private fun FlowContent.themeToggle(currentTheme: WeddingTheme) {
-        div("navbar-item") {
-            when (currentTheme) {
-                WeddingTheme.Dark -> sunButton()
-                WeddingTheme.Light -> moonButton()
+    private fun FlowContent.logout(selectedAssignee: Assignee?) {
+        if (selectedAssignee != null) {
+            button(classes = "button") {
+                hxPost = "reset"
+                +"Hello ${selectedAssignee.name}! Not you?"
             }
         }
     }
 
-    private fun DIV.moonButton() {
+    private fun FlowContent.themeToggle(currentTheme: WeddingTheme) {
+        when (currentTheme) {
+            WeddingTheme.Dark -> sunButton()
+            WeddingTheme.Light -> moonButton()
+        }
+    }
+
+    private fun FlowContent.moonButton() {
         button(classes = "button") {
             hxPost = "/toggle/${WeddingTheme.Dark}"
             span("icon has-text-link") {
@@ -42,7 +42,7 @@ object NavBar {
         }
     }
 
-    private fun DIV.sunButton() {
+    private fun FlowContent.sunButton() {
         button(classes = "button") {
             hxPost = "/toggle/${WeddingTheme.Light}"
             span("icon has-text-warning") {
