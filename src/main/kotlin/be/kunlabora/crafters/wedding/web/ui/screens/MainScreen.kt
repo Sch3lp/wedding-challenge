@@ -41,7 +41,7 @@ object MainScreen {
             if (challenges.isEmpty()) {
                 div("box") {
                     div("field") {
-                        p { +"No more challenges for you! Simply enjoy the wedding!" }
+                        p { +"No challenges for you! Simply enjoy the wedding!" }
                     }
                 }
             } else challenges.forEach { challenge(it) }
