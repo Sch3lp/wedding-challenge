@@ -11,19 +11,25 @@ object MainScreen {
     const val assigneeFieldName = "assignee"
 
     fun FlowContent.assigneeSelection(assignees: List<Assignee>) {
-        p { +"Who are you?" }
-        div(classes = "select") {
-            select {
-                name = assigneeFieldName
-                hxPost = "select-assignee"
-                option {
-                    value = ""
-                    +""
-                }
-                assignees.forEach { assignee ->
-                    option {
-                        value = assignee.id.value
-                        +assignee.name
+        div("container") {
+            div("box") {
+                div("field") {
+                    label("label") { +"Who are you?" }
+                    div(classes = "select control") {
+                        select {
+                            name = assigneeFieldName
+                            hxPost = "select-assignee"
+                            option {
+                                value = ""
+                                +""
+                            }
+                            assignees.forEach { assignee ->
+                                option {
+                                    value = assignee.id.value
+                                    +assignee.name
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -31,20 +37,21 @@ object MainScreen {
     }
 
     fun FlowContent.showChallenges(challenges: List<Challenge>) {
-        section(classes = "section") {
-            id = "quote-section"
-            div(classes = "container") {
-                if (challenges.isEmpty()) {
-                    + "No challenges for you! Simply enjoy the wedding!"
-                } else challenges.forEach { challenge(it) }
-            }
+        div("container") {
+            if (challenges.isEmpty()) {
+                div("box") {
+                    div("field is-centered") {
+                        p { +"No challenges for you! Simply enjoy the wedding!" }
+                    }
+                }
+            } else challenges.forEach { challenge(it) }
         }
     }
 
     private fun FlowContent.challenge(challenge: Challenge) {
         div("card") {
             div("card-content") {
-                + challenge.description
+                +challenge.description
             }
         }
     }

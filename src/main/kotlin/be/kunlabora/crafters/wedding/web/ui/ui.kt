@@ -1,12 +1,12 @@
 package be.kunlabora.crafters.wedding.web.ui
 
-import be.kunlabora.crafters.wedding.service.domain.AssigneeId
+import be.kunlabora.crafters.wedding.service.domain.Assignee
 import be.kunlabora.crafters.wedding.web.ui.components.Hero.hero
 import kotlinx.html.*
 import kotlinx.html.stream.appendHTML
 import java.io.StringWriter
 
-fun wrapper(title: String, selectedAssigneeId: AssigneeId?, block: BODY.() -> Unit) =
+fun wrapper(title: String, selectedAssignee: Assignee?, block: BODY.() -> Unit) =
     StringWriter().appendHTML().html {
         head {
             title { +title }
@@ -24,7 +24,7 @@ fun wrapper(title: String, selectedAssigneeId: AssigneeId?, block: BODY.() -> Un
             script(src = "https://unpkg.com/hyperscript.org@0.9.12") {}
         }
         body {
-            hero(selectedAssigneeId)
+            hero(selectedAssignee)
             div(classes = "block") { id = "errorMessages" }
             block()
             div { id = "modals-here" }

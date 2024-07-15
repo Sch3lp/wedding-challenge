@@ -2,6 +2,7 @@ package be.kunlabora.crafters.wedding.web
 
 import be.kunlabora.crafters.wedding.service.CompletedChallenge
 import be.kunlabora.crafters.wedding.service.WeddingBehavior
+import be.kunlabora.crafters.wedding.service.domain.Assignee
 import be.kunlabora.crafters.wedding.service.domain.AssigneeId
 import be.kunlabora.crafters.wedding.service.domain.ChallengeId
 import be.kunlabora.crafters.wedding.service.get
@@ -41,16 +42,19 @@ class WebConfig : WebMvcConfigurer {
 
     @Bean
     fun routes(wedding: WeddingBehavior) = router {
+        fun SelectedAssigneeCookie?.fetch(): Assignee? =
+            this?.assigneeId?.let { id -> wedding.assignees.first { it.id ==  id } }
+
         GET("/") { request ->
-            val selectedAssigneeId = request.getSelectedAssignee()?.assigneeId
+            val selectedAssignee = request.getSelectedAssignee()?.fetch()
 
             val title = "WeddingChallenge"
             ServerResponse.status(HttpStatus.OK)
                 .contentType(MediaType.TEXT_HTML)
                 .body(
-                    wrapper(title, selectedAssigneeId) {
-                        if (selectedAssigneeId != null) {
-                            showChallenges(wedding.findAllChallengesFor(selectedAssigneeId))
+                    wrapper(title, selectedAssignee) {
+                        if (selectedAssignee != null) {
+                            showChallenges(wedding.findAllChallengesFor(selectedAssignee.id))
                         } else {
                             assigneeSelection(wedding.assignees)
                         }
@@ -94,4 +98,6 @@ class WebConfig : WebMvcConfigurer {
 
     private fun ServerRequest.getSelectedAssignee(): SelectedAssigneeCookie? =
         cookies().toSingleValueMap()[selected_assignee_cookie]?.let { SelectedAssigneeCookie(it.value) }
+
 }
+
