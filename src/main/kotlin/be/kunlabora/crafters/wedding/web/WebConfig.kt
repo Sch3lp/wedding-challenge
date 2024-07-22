@@ -43,7 +43,7 @@ class WebConfig : WebMvcConfigurer {
                 .body(
                     wrapper(title, theme ?: WeddingTheme.default, selectedAssignee) {
                         if (selectedAssignee != null) {
-                            showChallenges(wedding.findAllChallengesFor(selectedAssignee.id))
+                            showChallenges(wedding, selectedAssignee)
                         } else {
                             assigneeSelection(emptyList())
                         }

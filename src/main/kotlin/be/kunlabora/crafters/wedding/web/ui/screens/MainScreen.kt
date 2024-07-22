@@ -1,5 +1,6 @@
 package be.kunlabora.crafters.wedding.web.ui.screens
 
+import be.kunlabora.crafters.wedding.service.WeddingBehavior
 import be.kunlabora.crafters.wedding.service.domain.Assignee
 import be.kunlabora.crafters.wedding.service.domain.Challenge
 import be.kunlabora.crafters.wedding.web.ui.components.Htmx.hxGet
@@ -61,21 +62,43 @@ object MainScreen {
 
     }
 
-    fun FlowContent.showChallenges(challenges: List<Challenge>) {
+    fun FlowContent.showChallenges(wedding: WeddingBehavior, selectedAssignee: Assignee) {
+        val assigneeChallenges = wedding.findAllChallengesFor(selectedAssignee.id)
         div("container") {
-            if (challenges.isEmpty()) {
-                div("box") {
-                    div("field") {
-                        p { +"No challenges for you! Simply enjoy the wedding!" }
-                    }
+            if (assigneeChallenges.isEmpty()) emptyChallenges()
+            else {
+                assigneeChallenges(assigneeChallenges)
+
+                if (assigneeChallenges.all { it.completed }) {
+                    showAllCompletedChallenges(wedding.allCompletedChallenges(selectedAssignee.id))
                 }
-            } else challenges.forEach { challenge(it) }
+            }
         }
     }
 
+    private fun DIV.assigneeChallenges(challenges: List<Challenge>) {
+        challenges.forEach { challenge(it) }
+    }
+
+    private fun DIV.emptyChallenges() {
+        div("box") {
+            div("field") {
+                p { +"No challenges for you! Simply enjoy the wedding!" }
+            }
+        }
+    }
+
+    private fun FlowContent.showAllCompletedChallenges(completedChallenges: List<Pair<String, String>>) {
+        if (completedChallenges.isNotEmpty()) {
+            p(classes = "ml-3") { +"Other people completed these already:" }
+            completedChallenges.forEach { completedChallenge(it.second, it.first) }
+        }
+    }
+
+
     private fun FlowContent.challenge(challenge: Challenge) {
         if (!challenge.completed) uncompletedChallenge(challenge)
-        else completedChallenge(challenge)
+        else completedChallenge(challenge.description)
     }
 
     private fun FlowContent.uncompletedChallenge(challenge: Challenge) {
@@ -93,10 +116,14 @@ object MainScreen {
         }
     }
 
-    private fun FlowContent.completedChallenge(challenge: Challenge) {
+    private fun FlowContent.completedChallenge(challengeDescription: String, assigneeName: String? = null) {
         div("card") {
             header("card-header") {
-                p("card-header-title has-text-success") { +challenge.description }
+                p("card-header-title has-text-success") {
+                    assigneeName
+                        ?.let { +"$it completed: $challengeDescription" }
+                        ?: +challengeDescription
+                }
             }
         }
     }
