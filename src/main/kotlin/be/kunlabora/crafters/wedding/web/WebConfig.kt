@@ -1,6 +1,7 @@
 package be.kunlabora.crafters.wedding.web
 
-import be.kunlabora.crafters.wedding.service.CompletedChallenge
+import be.kunlabora.crafters.wedding.service.CompleteChallenge
+import be.kunlabora.crafters.wedding.service.UndoCompletedChallenge
 import be.kunlabora.crafters.wedding.service.WeddingBehavior
 import be.kunlabora.crafters.wedding.service.domain.Assignee
 import be.kunlabora.crafters.wedding.service.domain.AssigneeId
@@ -70,8 +71,22 @@ class WebConfig : WebMvcConfigurer {
 
         POST("complete/{id}") { request ->
             val id: ChallengeId = ChallengeId.fromString(request.pathVariable("id"))
-            val completeChallenge = CompletedChallenge(id)
+            val completeChallenge = CompleteChallenge(id)
             wedding.execute(completeChallenge)
+                .map {
+                    ServerResponse.status(HttpStatus.OK)
+                        .header("HX-Redirect", "/")
+                        .build()
+                }.recover { failure ->
+                    ServerResponse.status(HttpStatus.OK)
+                        .body(partial { errorMessage("Oopsie! Something broke!", failure.message) })
+                }.get()
+        }
+
+        POST("uncomplete/{id}") { request ->
+            val id: ChallengeId = ChallengeId.fromString(request.pathVariable("id"))
+            val undoCompleteChallenge = UndoCompletedChallenge(id)
+            wedding.execute(undoCompleteChallenge)
                 .map {
                     ServerResponse.status(HttpStatus.OK)
                         .header("HX-Redirect", "/")

@@ -36,7 +36,8 @@ class EntityId<E> private constructor(val value: String) {
 //marker interface
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 sealed interface Command
-data class CompletedChallenge(val id: ChallengeId) : Command
+data class CompleteChallenge(val id: ChallengeId) : Command
+data class UndoCompletedChallenge(val id: ChallengeId) : Command
 
 sealed class Result<out F, out T> {
     data class Error<F>(val value: F) : Result<F, Nothing>()

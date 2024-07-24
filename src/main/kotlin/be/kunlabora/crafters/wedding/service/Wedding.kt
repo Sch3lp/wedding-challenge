@@ -12,9 +12,8 @@ typealias ChallengeDescription = String
 interface WeddingBehavior {
     val assignees: List<Assignee>
 
-    fun execute(
-        completedChallenge: CompletedChallenge,
-    ): Result<ChallengeFailure, Challenge>
+    fun execute(completeChallenge: CompleteChallenge): Result<ChallengeFailure, Challenge>
+    fun execute(undoCompletedChallenge: UndoCompletedChallenge): Result<ChallengeFailure, Challenge>
 
     fun findAllChallengesFor(assigneeId: AssigneeId): List<Challenge>
     fun allCompletedChallenges(except: AssigneeId): List<Pair<AssigneeName, ChallengeDescription>>
@@ -26,11 +25,20 @@ class Wedding(
 ) : WeddingBehavior {
 
     override fun execute(
-        completedChallenge: CompletedChallenge,
+        completeChallenge: CompleteChallenge,
     ): Result<ChallengeFailure, Challenge> {
-        return challenges.getById(completedChallenge.id)
+        return challenges.getById(completeChallenge.id)
             .map { challenge ->
                 challenge.markAsCompleted().store()
+            }
+    }
+
+    override fun execute(
+        undoCompletedChallenge: UndoCompletedChallenge,
+    ): Result<ChallengeFailure, Challenge> {
+        return challenges.getById(undoCompletedChallenge.id)
+            .map { challenge ->
+                challenge.markAsUncompleted().store()
             }
     }
 

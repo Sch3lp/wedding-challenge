@@ -15,6 +15,8 @@ data class Challenge(
 ) {
     fun markAsCompleted(): Challenge =
         copy(completed = true, completedOn = LocalDateTime.now())
+    fun markAsUncompleted(): Challenge =
+        copy(completed = false, completedOn = null)
 }
 
 data class Assignee(

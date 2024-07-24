@@ -28,7 +28,7 @@ object MainScreen {
                             placeholder = "Who are you?"
                             name = "q"
                             hxGet = "search"
-                            hxTrigger = "input changed delay:500ms, search"
+                            hxTrigger = "input changed delay:250ms, search"
                             hxTarget = "#assignees"
 
                             hyper = "on htmx:afterOnLoad wait 10ms then add .is-active to #$assigneeDropdown"
@@ -98,16 +98,16 @@ object MainScreen {
 
     private fun FlowContent.challenge(challenge: Challenge) {
         if (!challenge.completed) uncompletedChallenge(challenge)
-        else completedChallenge(challenge.description)
+        else completedChallenge(challenge)
     }
 
     private fun FlowContent.uncompletedChallenge(challenge: Challenge) {
         div("card") {
             header("card-header") {
                 p("card-header-title") { +challenge.description }
-                button(classes = "card-header-icon") {
+                button(classes = "card-header-icon is-primary") {
                     hxPost = "/complete/${challenge.id.value}"
-
+                    +"Complete"
                     span("icon") {
                         i("fas fa-check has-text-success")
                     }
@@ -116,13 +116,26 @@ object MainScreen {
         }
     }
 
-    private fun FlowContent.completedChallenge(challengeDescription: String, assigneeName: String? = null) {
+    private fun FlowContent.completedChallenge(challengeDescription: String, assigneeName: String) {
         div("card") {
             header("card-header") {
                 p("card-header-title has-text-success") {
-                    assigneeName
-                        ?.let { +"$it completed: $challengeDescription" }
-                        ?: +challengeDescription
+                    +"$assigneeName completed: $challengeDescription"
+                }
+            }
+        }
+    }
+
+    private fun FlowContent.completedChallenge(challenge: Challenge) {
+        div("card") {
+            header("card-header") {
+                p("card-header-title has-text-success") { +challenge.description }
+                button(classes = "card-header-icon is-primary") {
+                    hxPost = "/uncomplete/${challenge.id.value}"
+                    +"Undo"
+                    span("icon") {
+                        i("fas fa-undo has-text-warning")
+                    }
                 }
             }
         }
