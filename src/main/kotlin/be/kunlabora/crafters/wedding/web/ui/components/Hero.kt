@@ -18,6 +18,14 @@ object Hero {
                     h2(classes = "subtitle") {
                         +"Complete challenges as you party!"
                     }
+                    a(classes = "link") {
+                        href = "https://kunlabora.be"
+                        i(classes = "icon is-small") {
+                            img {
+                                src = "Kunlabora-Icon-Color.svg"
+                            }
+                        }
+                    }
                 }
             }
         }
