@@ -2,8 +2,6 @@ package be.kunlabora.crafters.wedding.service
 
 import be.kunlabora.crafters.wedding.service.Result.Error
 import be.kunlabora.crafters.wedding.service.Result.Ok
-import be.kunlabora.crafters.wedding.service.domain.ChallengeId
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import java.util.*
 
 typealias IdProvider = () -> String
@@ -32,11 +30,6 @@ class EntityId<E> private constructor(val value: String) {
 
     override fun toString() = "EntityId($value)"
 }
-
-//marker interface
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
-sealed interface Command
-data class CompletedChallenge(val id: ChallengeId) : Command
 
 sealed class Result<out F, out T> {
     data class Error<F>(val value: F) : Result<F, Nothing>()
