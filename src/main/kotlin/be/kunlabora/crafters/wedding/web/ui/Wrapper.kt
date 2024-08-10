@@ -42,7 +42,7 @@ fun wrapper(
         )
         link(
             rel = "stylesheet",
-            href = "https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/fontawesome.min.css"
+            href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         )
         script(src = "https://unpkg.com/htmx.org@2.0.0") {}
         script(src = "https://unpkg.com/hyperscript.org@0.9.12") {}

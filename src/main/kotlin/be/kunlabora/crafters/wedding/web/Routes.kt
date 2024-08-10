@@ -3,6 +3,7 @@ package be.kunlabora.crafters.wedding.web
 import be.kunlabora.crafters.wedding.service.WeddingBehavior
 import be.kunlabora.crafters.wedding.service.domain.Assignee
 import be.kunlabora.crafters.wedding.service.domain.AssigneeId
+import be.kunlabora.crafters.wedding.service.get
 import be.kunlabora.crafters.wedding.web.ui.partial
 import be.kunlabora.crafters.wedding.web.ui.screens.assigneeSelectionKey
 import be.kunlabora.crafters.wedding.web.ui.screens.showAssigneeSelection
@@ -27,26 +28,23 @@ class Routes {
             val title = "WeddingChallenge"
             val assignees = wedding.getAssignees()
 
-            ServerResponse.status(HttpStatus.OK)
-                .contentType(MediaType.TEXT_HTML)
-                .body(
-                    wrapper(title) { showAssigneeSelection(assignees) }
-                )
+            wrapperResponse(title) { showAssigneeSelection(assignees) }
         }
 
         POST("selectassignee") { request ->
-            val assigneeIdAsString: String? = request.paramOrNull(assigneeSelectionKey)
-            val assigneeId : AssigneeId? = assigneeIdAsString?.let { AssigneeId.fromString(it) }
-
-            val assignee: Assignee? = wedding.getAssignees().firstOrNull { assignee -> assignee.id == assigneeId }
-
-            ServerResponse.status(HttpStatus.OK)
-                .contentType(MediaType.TEXT_HTML)
-                .body(
-                    partial {
-                        welcome(assignee)
+            val assigneeIdAsString: String = request.paramOrNull(assigneeSelectionKey)!!
+//            val assigneeIdAsString: String = request.pathVariable(assigneeSelectionKey)
+            val assigneeId: AssigneeId = AssigneeId.fromString(assigneeIdAsString)
+            wedding.getAssignee(assigneeId)
+                .map { assignee ->
+                    partialResponse { welcome(assignee) }
+                }
+                .recover { failure ->
+                    partialResponse {
+                        p { +failure.message }
                     }
-                )
+                }
+                .get()
         }
     }
 }
@@ -54,3 +52,17 @@ class Routes {
 fun FlowContent.welcome(assignee: Assignee?) {
     p { +"Hello ${assignee?.name}. Enjoy the party!" }
 }
+
+private fun partialResponse(content: FlowContent.() -> Unit) =
+    ServerResponse.status(HttpStatus.OK)
+        .contentType(MediaType.TEXT_HTML)
+        .body(
+            partial { content() }
+        )
+
+private fun wrapperResponse(title: String, content: FlowContent.() -> Unit) =
+    ServerResponse.status(HttpStatus.OK)
+        .contentType(MediaType.TEXT_HTML)
+        .body(
+            wrapper(title) { content() }
+        )
