@@ -1,0 +1,10 @@
+<div class="container">
+  <div class="dropdown" id="assigneeDropdown">
+    <div class="dropdown-trigger">
+      <div class="control has-icons-left"><input type="search" class="input is-medium" placeholder="Who are you?" name="q" hx-get="search" hx-trigger="input changed delay:250ms, search" hx-target="#assignees" _="on htmx:afterOnLoad wait 10ms then add .is-active to #assigneeDropdown" autocomplete="off" aria-haspopup="true" aria-controls="dropdown-menu"><span class="icon is-left"><i class="fa fa-search"></i></span></div>
+    </div>
+    <div class="dropdown-menu" id="assignees" role="menu">
+      <div class="dropdown-content is-large"><a class="dropdown-item" hx-post="select-assignee/1234" hx-target="#assigneeDropdown">Joris</a><a class="dropdown-item" hx-post="select-assignee/6789" hx-target="#assigneeDropdown">Jonathan</a></div>
+    </div>
+  </div>
+</div>

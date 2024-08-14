@@ -5,7 +5,8 @@ import be.kunlabora.crafters.wedding.service.domain.Assignee
 import be.kunlabora.crafters.wedding.service.domain.AssigneeId
 import be.kunlabora.crafters.wedding.service.get
 import be.kunlabora.crafters.wedding.web.ui.partial
-import be.kunlabora.crafters.wedding.web.ui.screens.assigneeSelectionKey
+import be.kunlabora.crafters.wedding.web.ui.screens.assignees
+import be.kunlabora.crafters.wedding.web.ui.screens.searchEndpoint
 import be.kunlabora.crafters.wedding.web.ui.screens.showAssigneeSelection
 import be.kunlabora.crafters.wedding.web.ui.wrapper
 import kotlinx.html.FlowContent
@@ -24,6 +25,14 @@ class Routes {
 
     @Bean
     fun router(wedding: WeddingBehavior) = router {
+        GET(searchEndpoint) { request ->
+            val queryString = request.paramOrNull("q") ?: ""
+            val filteredAssignees = wedding.getAssignees().filter { it.name.contains(queryString, ignoreCase = true) }
+
+            partialResponse { assignees(filteredAssignees) }
+        }
+
+
         GET { request ->
             val title = "WeddingChallenge"
             val assignees = wedding.getAssignees()
@@ -31,9 +40,8 @@ class Routes {
             wrapperResponse(title) { showAssigneeSelection(assignees) }
         }
 
-        POST("selectassignee") { request ->
-            val assigneeIdAsString: String = request.paramOrNull(assigneeSelectionKey)!!
-//            val assigneeIdAsString: String = request.pathVariable(assigneeSelectionKey)
+        POST("select-assignee/{assigneeId}") { request ->
+            val assigneeIdAsString: String = request.pathVariable("assigneeId")
             val assigneeId: AssigneeId = AssigneeId.fromString(assigneeIdAsString)
             wedding.getAssignee(assigneeId)
                 .map { assignee ->
