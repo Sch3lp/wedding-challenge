@@ -1,7 +1,6 @@
 package be.kunlabora.crafters.wedding.service
 
 import be.kunlabora.crafters.wedding.ChallengeFailure
-import be.kunlabora.crafters.wedding.FetchFailure
 import be.kunlabora.crafters.wedding.service.domain.*
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 
@@ -16,7 +15,7 @@ data class UndoCompletedChallenge(val id: ChallengeId) : Command
 
 interface WeddingBehavior {
     fun getAssignees(): List<Assignee>
-    fun getAssignee(assigneeId: AssigneeId): Result<FetchFailure, Assignee>
+    fun getAssignee(assigneeId: AssigneeId): Assignee
 
     fun execute(completeChallenge: CompleteChallenge): Result<ChallengeFailure, Challenge>
     fun execute(undoCompletedChallenge: UndoCompletedChallenge): Result<ChallengeFailure, Challenge>
@@ -31,10 +30,9 @@ class Wedding(
 ) : WeddingBehavior {
 
     override fun getAssignees(): List<Assignee> = assignees
-    override fun getAssignee(assigneeId: AssigneeId): Result<FetchFailure, Assignee> =
+    override fun getAssignee(assigneeId: AssigneeId): Assignee =
         assignees.firstOrNull { it.id == assigneeId }
-            ?.let { Result.Ok(it) }
-            ?: Result.Error(FetchFailure("Could not find assignee with id ${assigneeId.value}"))
+            ?: error("Could not find assignee with id ${assigneeId.value}")
 
 
     override fun execute(

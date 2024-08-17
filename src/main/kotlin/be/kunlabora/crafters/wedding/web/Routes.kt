@@ -3,11 +3,11 @@ package be.kunlabora.crafters.wedding.web
 import be.kunlabora.crafters.wedding.service.WeddingBehavior
 import be.kunlabora.crafters.wedding.service.domain.Assignee
 import be.kunlabora.crafters.wedding.service.domain.AssigneeId
-import be.kunlabora.crafters.wedding.service.get
 import be.kunlabora.crafters.wedding.web.ui.partial
 import be.kunlabora.crafters.wedding.web.ui.screens.assignees
 import be.kunlabora.crafters.wedding.web.ui.screens.searchEndpoint
 import be.kunlabora.crafters.wedding.web.ui.screens.showAssigneeSelection
+import be.kunlabora.crafters.wedding.web.ui.screens.showChallenges
 import be.kunlabora.crafters.wedding.web.ui.wrapper
 import kotlinx.html.FlowContent
 import kotlinx.html.p
@@ -32,7 +32,6 @@ class Routes {
             partialResponse { assignees(filteredAssignees) }
         }
 
-
         GET { request ->
             val title = "WeddingChallenge"
             val assignees = wedding.getAssignees()
@@ -43,17 +42,13 @@ class Routes {
         POST("select-assignee/{assigneeId}") { request ->
             val assigneeIdAsString: String = request.pathVariable("assigneeId")
             val assigneeId: AssigneeId = AssigneeId.fromString(assigneeIdAsString)
-            wedding.getAssignee(assigneeId)
-                .map { assignee ->
-                    partialResponse { welcome(assignee) }
-                }
-                .recover { failure ->
-                    partialResponse {
-                        p { +failure.message }
-                    }
-                }
-                .get()
+            val assignee = wedding.getAssignee(assigneeId)
+            partialResponse {
+                showChallenges(wedding, assignee)
+            }
         }
+
+        challengeRoutes(wedding)
     }
 }
 

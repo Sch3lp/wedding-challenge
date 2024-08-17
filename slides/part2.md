@@ -1,15 +1,14 @@
-# Part 3
+# Part 2
 
 ## Recap
 Screen that allows choosing Assignee and showing a welcome message.
 In this part: 
-* Persisting user state as cookies
-* Showing Challenges for the selected assignee
-* More Unit Testing components
+* Combining Bulma's Dropdown and htmx's active search into a different assignee selection component, using expand and contract
+* Approval Tests before refactoring
 
 ## LiveCoding
 ### Intro
-1. Start app in debug (for hot-reloading) and show http://localhost:8080, select assignee, refresh page
+1. Start app in debug (for hot-reloading) and show http://localhost:8080, select assignee
 
 Explain plan:
 
