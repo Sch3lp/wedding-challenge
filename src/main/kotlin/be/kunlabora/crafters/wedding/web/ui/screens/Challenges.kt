@@ -9,6 +9,12 @@ import kotlinx.html.*
 fun FlowContent.showChallenges(wedding: WeddingBehavior, selectedAssignee: Assignee) {
     val assigneeChallenges = wedding.findAllChallengesFor(selectedAssignee.id)
     div("container") {
+
+        button(classes = "button is-primary") {
+            hxPost = "unselect-assignee"
+            +"Not you?"
+        }
+
         if (assigneeChallenges.isEmpty()) emptyChallenges()
         else {
             assigneeChallenges(assigneeChallenges)
