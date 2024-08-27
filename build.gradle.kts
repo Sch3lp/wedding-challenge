@@ -58,6 +58,5 @@ tasks.withType<Test> {
 }
 
 tasks.named<BootBuildImage>("bootBuildImage") {
-	//TODO: configure build image name and use that in docker-compose.yml
 	imageName = "812958718504.dkr.ecr.eu-central-1.amazonaws.com/kunlaquota-repo:springboot-ec2"
 }

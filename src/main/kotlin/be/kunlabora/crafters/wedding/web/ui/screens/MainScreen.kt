@@ -27,6 +27,8 @@ object MainScreen {
                         ) {
                             placeholder = "Who are you?"
                             name = "q"
+                            autoComplete = false
+
                             hxGet = "search"
                             hxTrigger = "input changed delay:250ms, search"
                             hxTarget = "#assignees"
