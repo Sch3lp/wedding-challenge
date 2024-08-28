@@ -1,6 +1,6 @@
-# KunlaQuota
+# Wedding Challenge
 
-A _[Breakable Toy](https://www.oreilly.com/library/view/apprenticeship-patterns/9780596806842/ch05.html#breakable_toys)_, to help understand building backend web applications.
+A web application to help wedding guests get out of their comfort zone and talk to people they don't know.
 
 ## Tech Stack
-Built using Kotlin with SpringBoot, SpringWebMVC's RouteDsl and Spring Data JDBC in the data layer.
+Built using Kotlin with SpringBoot, SpringWebMVC's RouteDsl, and a combination of Kotlinx.html and htmx to build a webapp with.
