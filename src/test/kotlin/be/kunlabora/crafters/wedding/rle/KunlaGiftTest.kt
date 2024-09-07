@@ -24,8 +24,69 @@ class KunlaGiftTest {
     fun decode() {
         println(decode(input))
     }
+
+    @Test
+    fun decodeWithMorse() {
+        println(input.rleDecoded().morseDecoded())
+    }
+
+    @Test
+    fun `try morse`() {
+        assertThat("TTKLKTKLKLKLTLKKLTKLTTKLKKKLN".morseDecoded()).isEqualTo("GREETINGS\n")
+    }
 }
 
+private fun String.morseDecoded(): String {
+    val toMorse: Map<Char, Char> = mapOf(
+        'K' to '.',
+        'T' to '-',
+        'L' to ' ',
+        'N' to '\n',
+    )
+    val morseToString: Map<String, String> = mapOf(
+        ".-" to "A",
+        "-..." to "B",
+        "-.-." to "C",
+        "-.." to "D",
+        "." to "E",
+        "..-." to "F",
+        "--." to "G",
+        "...." to "H",
+        ".." to "I",
+        ".---" to "J",
+        "-.-" to "K",
+        ".-.." to "L",
+        "--" to "M",
+        "-." to "N",
+        "---" to "O",
+        ".--." to "P",
+        "--.-" to "Q",
+        ".-." to "R",
+        "..." to "S",
+        "-" to "T",
+        "..-" to "U",
+        "...-" to "V",
+        ".--" to "W",
+        "-..-" to "X",
+        "-.--" to "Y",
+        "--.." to "Z",
+        "-----" to "0",
+        ".----" to "1",
+        "..---" to "2",
+        "...--" to "3",
+        "....-" to "4",
+        "....." to "5",
+        "-...." to "6",
+        "--..." to "7",
+        "---.." to "8",
+        "----." to "9",
+        ".-.-.-" to ".",
+        ".--.-." to "@",
+        " " to " ",
+        "\n" to "\n",
+    )
+    return this.map { toMorse[it] }.joinToString("").split(" ").map { morseToString[it] }.joinToString("")
+}
 
 
 private fun decode(input: String): String {
